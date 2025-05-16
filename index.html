@@ -2,62 +2,75 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Interaction Checker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ToxScan – Drug Interaction Checker</title>
   <style>
     body {
-      background-color: #f8fafc;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f1f5f9;
       margin: 0;
       padding: 0;
+    }
+
+    .header {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      min-height: 100vh;
+      padding: 10px 30px;
+      background-color: #ffffff;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .logo {
+      height: 70px;
     }
 
     .container {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       max-width: 600px;
-      padding: 2rem;
-      width: 100%;
-      text-align: center;
+      margin: 40px auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
     }
 
     h1 {
-      font-size: 1.8rem;
-      margin-bottom: 1rem;
+      text-align: center;
       color: #1e293b;
+      font-size: 24px;
     }
 
-    .warning {
-      background: #fef3c7;
+    .alert {
+      background-color: #fef3c7;
+      border: 1px solid #facc15;
       color: #92400e;
-      padding: 1rem;
-      border-radius: 5px;
-      margin-bottom: 1.5rem;
-      font-size: 0.9rem;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 20px 0;
+      text-align: center;
     }
 
-    input {
+    .form-section {
+      margin-top: 30px;
+    }
+
+    input[type="text"] {
       width: 100%;
-      padding: 0.8rem;
-      margin: 0.5rem 0;
-      border: 1px solid #cbd5e1;
-      border-radius: 5px;
-      font-size: 1rem;
+      padding: 10px;
+      margin-top: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
     }
 
     button {
       background-color: #2563eb;
       color: white;
+      padding: 10px 20px;
+      font-size: 16px;
       border: none;
-      padding: 0.8rem 1.2rem;
-      border-radius: 5px;
-      font-size: 1rem;
-      margin-top: 1rem;
+      border-radius: 8px;
       cursor: pointer;
     }
 
@@ -66,60 +79,95 @@
     }
 
     .result {
-      margin-top: 1.5rem;
-      text-align: left;
-      background-color: #f1f5f9;
-      padding: 1rem;
-      border-radius: 5px;
-      color: #334155;
+      margin-top: 30px;
+      background-color: #e0f2fe;
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 5px solid #0284c7;
+      font-size: 15px;
     }
   </style>
 </head>
 <body>
+  <header class="header">
+    <img src="Lebanese International University Logo.png" alt="LIU Logo" class="logo left-logo">
+    <img src="pharmacy.jpeg" alt="Pharmacy Logo" class="logo right-logo">
+  </header>
+
   <div class="container">
-    <h1>Drug–Food Interaction Checker</h1>
-    <div class="warning">
+    <h1>Drug–Food & Drug–Drug Interaction Checker</h1>
+    <div class="alert">
       ⚠️ This tool is intended for professional use. Please consult a pharmacist before making any decisions based on this information.
     </div>
 
-    <input type="text" id="input1" placeholder="e.g., grapefruit or drug 1" />
-    <input type="text" id="input2" placeholder="e.g., warfarin or drug 2" />
-    <button onclick="checkInteraction()">Check Interaction</button>
+    <div class="form-section">
+      <h3>Food–Drug Interaction</h3>
+      <input type="text" id="foodInput" placeholder="Enter food (e.g., grapefruit)">
+      <input type="text" id="drugInput" placeholder="Enter drug (e.g., warfarin)">
+      <button onclick="checkInteraction()">Check Interaction</button>
+    </div>
+
+    <div class="form-section">
+      <h3>Drug–Drug Interaction</h3>
+      <input type="text" id="drug1Input" placeholder="Enter first drug (e.g., ibuprofen)">
+      <input type="text" id="drug2Input" placeholder="Enter second drug (e.g., warfarin)">
+      <button onclick="checkDrugDrugInteraction()">Check Drug–Drug Interaction</button>
+    </div>
 
     <div class="result" id="result"></div>
   </div>
 
   <script>
-    const interactions = {
-      'grapefruit+simvastatin': `Yes, interact.\n\nReason: Grapefruit increases the concentration of simvastatin in the blood, increasing the risk of muscle pain, myopathy, and rhabdomyolysis.`,
-      'alcohol+metronidazole': `Yes, interact.\n\nReason: Metronidazole interferes with alcohol breakdown, causing acetaldehyde buildup, which can lead to nausea, flushing, and headaches.`,
-      'alcohol+metformin': `Yes, interact.\n\nReason: Increases the risk of lactic acidosis. Symptoms include weakness, muscle pain, breathing difficulties, abdominal pain, and irregular heartbeat.`,
-      'vitamin k+warfarin': `Yes, interact.\n\nReason: Vitamin K rich foods (e.g., spinach, broccoli, green tea) can reduce warfarin's effectiveness, increasing the risk of clotting.`,
-      'ibuprofen+warfarin': `Yes, interact.\n\nReason: Increased risk of bleeding. Symptoms include gum bleeding, nosebleeds, unusual bruising, blood in urine/stool, and internal bleeding.`,
-      'simvastatin+erythromycin': `Yes, interact.\n\nReason: Can lead to rhabdomyolysis and liver damage.`,
-      'digoxin+verapamil': `Yes, interact.\n\nReason: Verapamil increases digoxin levels, possibly causing nausea, vomiting, visual disturbances, slow heart rate, and in severe cases, cardiac arrest.`,
-      'lisinopril+spironolactone': `Yes, interact.\n\nReason: Risk of hyperkalemia. Symptoms include muscle weakness, fatigue, heart palpitations, and nausea.`,
-      'ramipril+spironolactone': `Yes, interact.\n\nReason: Risk of hyperkalemia. Symptoms include muscle weakness, fatigue, heart palpitations, and nausea.`,
-      'theophylline+ciprofloxacin': `Yes, interact.\n\nReason: Ciprofloxacin inhibits CYP1A2, increasing theophylline levels, risking toxicity. Symptoms: nausea, headache, tachycardia, seizures, and arrhythmias.`,
-      'fluoxetine+tramadol': `Yes, interact.\n\nReason: Risk of serotonin syndrome. Symptoms: agitation, confusion, tremors, fever, rapid heart rate, high blood pressure, and in severe cases, seizures or unconsciousness.`,
-      'sertraline+tramadol': `Yes, interact.\n\nReason: Risk of serotonin syndrome. Symptoms: agitation, confusion, tremors, fever, rapid heart rate, high blood pressure, and in severe cases, seizures or unconsciousness.`
+    const foodDrugInteractions = {
+      "grapefruit+simvastatin": "Increases drug concentration — may lead to muscle pain, myopathy, or rhabdomyolysis.",
+      "alcohol+metformin": "Risk of lactic acidosis, muscle pain, fatigue, and irregular heartbeat.",
+      "warfarin+spinach": "Vitamin K-rich foods decrease warfarin effect — increases coagulation risk.",
+      "warfarin+broccoli": "Vitamin K-rich foods decrease warfarin effect — increases coagulation risk.",
+      "warfarin+green tea": "Vitamin K-rich foods decrease warfarin effect — increases coagulation risk."
+    };
+
+    const drugDrugInteractions = {
+      "ibuprofen+warfarin": "Increased bleeding risk: gum bleeding, nosebleeds, blood in urine or stool, and possible internal bleeding.",
+      "simvastatin+erythromycin": "Risk of rhabdomyolysis and liver damage.",
+      "digoxin+verapamil": "Verapamil increases Digoxin levels — may cause nausea, vision issues, slow heart rate, or cardiac arrest.",
+      "lisinopril+spironolactone": "Risk of hyperkalemia: muscle weakness, fatigue, heart palpitations.",
+      "ramipril+spironolactone": "Risk of hyperkalemia: muscle weakness, fatigue, heart palpitations.",
+      "theophylline+ciprofloxacin": "Increased risk of toxicity: headache, nausea, seizures, arrhythmia.",
+      "fluoxetine+tramadol": "High risk of serotonin syndrome: agitation, tremors, fever, seizures.",
+      "sertraline+tramadol": "High risk of serotonin syndrome: agitation, tremors, fever, seizures."
     };
 
     function normalize(input) {
       return input.trim().toLowerCase();
     }
 
-    function getInteraction(input1, input2) {
-      const key = `${normalize(input1)}+${normalize(input2)}`;
-      const altKey = `${normalize(input2)}+${normalize(input1)}`;
-      return interactions[key] || interactions[altKey] || 'No known interaction found.';
+    function checkInteraction() {
+      const food = normalize(document.getElementById("foodInput").value);
+      const drug = normalize(document.getElementById("drugInput").value);
+      const key = `${food}+${drug}`;
+      const resultDiv = document.getElementById("result");
+
+      if (foodDrugInteractions[key]) {
+        resultDiv.innerHTML = `<strong>Interaction found:</strong> ${foodDrugInteractions[key]}`;
+      } else {
+        resultDiv.innerHTML = "No known interaction found.";
+      }
     }
 
-    function checkInteraction() {
-      const input1 = document.getElementById('input1').value;
-      const input2 = document.getElementById('input2').value;
-      const result = getInteraction(input1, input2);
-      document.getElementById('result').textContent = result;
+    function checkDrugDrugInteraction() {
+      const drug1 = normalize(document.getElementById("drug1Input").value);
+      const drug2 = normalize(document.getElementById("drug2Input").value);
+      const key1 = `${drug1}+${drug2}`;
+      const key2 = `${drug2}+${drug1}`;
+      const resultDiv = document.getElementById("result");
+
+      if (drugDrugInteractions[key1]) {
+        resultDiv.innerHTML = `<strong>Interaction found:</strong> ${drugDrugInteractions[key1]}`;
+      } else if (drugDrugInteractions[key2]) {
+        resultDiv.innerHTML = `<strong>Interaction found:</strong> ${drugDrugInteractions[key2]}`;
+      } else {
+        resultDiv.innerHTML = "No known interaction found.";
+      }
     }
   </script>
 </body>
